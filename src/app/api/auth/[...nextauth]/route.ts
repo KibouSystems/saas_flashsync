@@ -18,6 +18,8 @@ const authOption : NextAuthOptions = {
         })
     ],
     callbacks:{
-        
+        async signIn({account,profile}){
+            
+        }
     }
 }
