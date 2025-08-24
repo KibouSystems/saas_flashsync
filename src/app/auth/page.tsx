@@ -49,12 +49,26 @@ function SignupForm() {
   return (
     <form >
       <input
-        type="text"
-        placeholder="Full Name"
-      />
-      <input
         type="email"
         placeholder="Email"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Username"
+        required
+      />
+      <input
+        type="text"
+        placeholder="First name"
+      />
+      <input
+        type="text"
+        placeholder="Last name"
+      />
+      <input
+        type="text"
+        placeholder="Company Name"
       />
       <input
         type="password"
