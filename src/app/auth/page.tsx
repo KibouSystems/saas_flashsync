@@ -26,15 +26,41 @@ export default function AuthPage() {
 }
 
 function LoginForm() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleLogin = async (e: React.FormEvent)=>{
+        e.preventDefault();
+
+        const res = await fetch('/api/auth/login',{
+            method: "POST",
+            body: JSON.stringify({email,password}),
+            headers: {
+                "Content-Type":"application/json"
+            }
+        })
+        const data = await res.json();
+        if(res.ok){
+            alert("Login Successful!");
+        }else{
+            alert(data.message || "Login Failed");
+        }
+    }
   return (
-    <form>
+    <form onSubmit={handleLogin}>
       <input
         type="email"
         placeholder="Email"
+        required
+        value={email}
+        onChange={(e)=>setEmail(e.target.value)}
       />
       <input
         type="password"
         placeholder="Password"
+        required
+        value={password}
+        onChange={(e)=>setPassword(e.target.value)}
       />
       <button
         type="submit"
@@ -46,43 +72,97 @@ function LoginForm() {
 }
 
 function SignupForm() {
+    const [form, setForm] = useState({
+        email:"",
+        username:"",
+        firstname:"",
+        lastname:"",
+        companyname:"",
+        password:"",
+        confirmPassword:""
+    })
+
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>){
+        setForm({...form, [e.target.name]: e.target.value})
+    }
+
+    const handleSignup = async(e: React.FormEvent)=>{
+        e.preventDefault();
+        if(form.password !== form.confirmPassword){
+            alert("Password do not match!");
+            return;
+        }
+        const res = await fetch('/api/auth/signup', {
+            method: "POST",
+            body: JSON.stringify(form),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+
+        const data = await res.json();
+        if(res.ok){
+            alert("Signup Successful");
+        }else{
+            alert(data.message || "Signup Failed")
+        }
+    }
   return (
-    <form >
+    <form onSubmit={handleSignup}>
       <input
+        name="email"
         type="email"
         placeholder="Email"
         required
+        value={form.email}
+        onChange={handleChange}
       />
       <input
+        name="username"
         type="text"
         placeholder="Username"
         required
+        value={form.username}
+        onChange={handleChange}
       />
       <input
+        name="firstname"
         type="text"
         placeholder="First name"
+        value={form.firstname}
+        onChange={handleChange}
       />
       <input
+        name="lastname"
         type="text"
         placeholder="Last name"
+        value={form.lastname}
+        onChange={handleChange}
       />
       <input
+        name="companyname"
         type="text"
         placeholder="Company Name"
+        value={form.companyname}
+        onChange={handleChange}
       />
       <input
+        name="password"
         type="password"
         placeholder="Password"
+        required
+        value={form.password}
+        onChange={handleChange}
       />
       <input
+        name="confirmPassword"
         type="password"
         placeholder="Confirm Password"
+        required
+        value={form.confirmPassword}
+        onChange={handleChange}
       />
-      <button
-        type="submit"
-      >
-        Sign Up
-      </button>
+      <button type="submit">Sign Up</button>
     </form>
   );
 }
