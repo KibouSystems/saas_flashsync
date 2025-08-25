@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User} from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 
 
 const prisma = new PrismaClient();
+interface SignupBody{
+    email: string
+    password: string
+    username: string
+    firstname: string
+    lastname: string
+    companyname?:string
+}
 
 
 export async function POST(req : Request){
     try {
-        const {email, password , username , firstname , lastname , companyname} = await req.json()
+        const body : SignupBody = await req.json()
+        const {email, password , username , firstname , lastname , companyname} = body
 
         if(!email || !password || !username || !companyname) {
             return NextResponse.json({
@@ -17,7 +26,7 @@ export async function POST(req : Request){
             },{status: 400})
         }
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser : User | null = await prisma.user.findUnique({
             where : {
                 email
             }
@@ -30,7 +39,7 @@ export async function POST(req : Request){
         }
 
         const hashPassword = await bcrypt.hash(password,10)
-        const user =await prisma.user.create({
+        const user : User =await prisma.user.create({
             data:{
                 email,
                 password:hashPassword,

@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+interface LoginBody {
+    email: string,
+    password: string
+}
 
-export async function POST(req : Request) {
+
+export async function POST(req : Request): Promise<NextResponse>{
     try {
-        const body = await req.json();
+        const body : LoginBody = await req.json();
         const {email, password} = body;
 
         if(!email || !password){
@@ -16,7 +21,7 @@ export async function POST(req : Request) {
             }, {status:400})
         }
 
-        const user = await prisma.user.findUnique({
+        const user: User | null = await prisma.user.findUnique({
             where:{
                 email
             }
@@ -28,7 +33,7 @@ export async function POST(req : Request) {
             },{status: 400})
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid  : boolean= await bcrypt.compare(password, user.password);
         if(!isPasswordValid){
             return NextResponse.json({
                 message: 'Invalid Password.'

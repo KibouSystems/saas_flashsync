@@ -128,6 +128,7 @@ function SignupForm() {
       <input
         name="firstname"
         type="text"
+        required
         placeholder="First name"
         value={form.firstname}
         onChange={handleChange}
@@ -135,6 +136,7 @@ function SignupForm() {
       <input
         name="lastname"
         type="text"
+        required
         placeholder="Last name"
         value={form.lastname}
         onChange={handleChange}
