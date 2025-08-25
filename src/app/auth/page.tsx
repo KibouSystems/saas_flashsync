@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,9 +16,7 @@ export default function AuthPage() {
         <p>
           {isLogin ? "Don't have an account?" : "Already have an account?"}
 
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-          >
+          <button onClick={() => setIsLogin(!isLogin)}>
             {isLogin ? "Sign Up" : "Login"}
           </button>
         </p>
@@ -26,87 +26,93 @@ export default function AuthPage() {
 }
 
 function LoginForm() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
 
-    const handleLogin = async (e: React.FormEvent)=>{
-        e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        const res = await fetch('/api/auth/login',{
-            method: "POST",
-            body: JSON.stringify({email,password}),
-            headers: {
-                "Content-Type":"application/json"
-            }
-        })
-        const data = await res.json();
-        if(res.ok){
-            alert("Login Successful!");
-        }else{
-            alert(data.message || "Login Failed");
-        }
+    const res = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (res?.ok) {
+      alert("Login Successful!");
+      router.push("/dashboard"); // Change to your intended route
+    } else {
+      alert(res?.error || "Login Failed");
     }
+  };
+
+  const handleGoogleLogin = () => {
+    signIn("google");
+  };
+
   return (
-    <form onSubmit={handleLogin}>
-      <input
-        type="email"
-        placeholder="Email"
-        required
-        value={email}
-        onChange={(e)=>setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        required
-        value={password}
-        onChange={(e)=>setPassword(e.target.value)}
-      />
-      <button
-        type="submit"
-      >
-        Login
-      </button>
-    </form>
+    <>
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit">Login</button>
+      </form>
+
+      <hr />
+      <button onClick={handleGoogleLogin}>Sign in with Google</button>
+    </>
   );
 }
 
 function SignupForm() {
-    const [form, setForm] = useState({
-        email:"",
-        username:"",
-        firstname:"",
-        lastname:"",
-        companyname:"",
-        password:"",
-        confirmPassword:""
-    })
+  const [form, setForm] = useState({
+    email: "",
+    username: "",
+    firstname: "",
+    lastname: "",
+    companyname: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>){
-        setForm({...form, [e.target.name]: e.target.value})
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      alert("Password do not match!");
+      return;
     }
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify(form),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    const handleSignup = async(e: React.FormEvent)=>{
-        e.preventDefault();
-        if(form.password !== form.confirmPassword){
-            alert("Password do not match!");
-            return;
-        }
-        const res = await fetch('/api/auth/signup', {
-            method: "POST",
-            body: JSON.stringify(form),
-            headers:{
-                "Content-Type":"application/json"
-            }
-        })
-
-        const data = await res.json();
-        if(res.ok){
-            alert("Signup Successful");
-        }else{
-            alert(data.message || "Signup Failed")
-        }
+    const data = await res.json();
+    if (res.ok) {
+      alert("Signup Successful");
+    } else {
+      alert(data.message || "Signup Failed");
     }
+  };
   return (
     <form onSubmit={handleSignup}>
       <input
