@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test":"jest",
-    "test:watch":"jest --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -37,6 +37,7 @@
     "eslint-config-next": "15.4.6",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
     "prisma": "^6.14.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.1",
