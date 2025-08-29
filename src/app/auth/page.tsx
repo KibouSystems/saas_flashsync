@@ -172,7 +172,6 @@ function SignupForm() {
       <input
         name="lastname"
         type="text"
-        required
         placeholder="Last name"
         value={form.lastname}
         onChange={handleChange}
