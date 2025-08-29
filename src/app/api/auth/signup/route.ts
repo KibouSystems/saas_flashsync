@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
 import { PrismaClient, User} from '@prisma/client';
 import bcrypt from 'bcryptjs';
