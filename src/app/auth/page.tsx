@@ -1,11 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard"); // Change this to your intended page
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  if (status === "authenticated") {
+    return <p>Redirecting...</p>;
+  }
+
   return (
     <div>
       <div>
@@ -15,7 +33,6 @@ export default function AuthPage() {
 
         <p>
           {isLogin ? "Don't have an account?" : "Already have an account?"}
-
           <button onClick={() => setIsLogin(!isLogin)}>
             {isLogin ? "Sign Up" : "Login"}
           </button>
@@ -40,8 +57,7 @@ function LoginForm() {
     });
 
     if (res?.ok) {
-      alert("Login Successful!");
-      router.push("/dashboard"); // Change to your intended route
+      router.push("/dashboard");
     } else {
       alert(res?.error || "Login Failed");
     }
@@ -88,6 +104,8 @@ function SignupForm() {
     confirmPassword: "",
   });
 
+  const router = useRouter();
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
@@ -95,9 +113,10 @@ function SignupForm() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
-      alert("Password do not match!");
+      alert("Passwords do not match!");
       return;
     }
+
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       body: JSON.stringify(form),
@@ -108,11 +127,22 @@ function SignupForm() {
 
     const data = await res.json();
     if (res.ok) {
-      alert("Signup Successful");
+      const loginRes = await signIn("credentials", {
+        redirect: false,
+        email: form.email,
+        password: form.password,
+      });
+
+      if (loginRes?.ok) {
+        router.push("/dashboard");
+      } else {
+        alert("Signup successful, but auto-login failed. Please login manually.");
+      }
     } else {
-      alert(data.message || "Signup Failed");
+      alert(data.error || "Signup Failed");
     }
   };
+
   return (
     <form onSubmit={handleSignup}>
       <input
