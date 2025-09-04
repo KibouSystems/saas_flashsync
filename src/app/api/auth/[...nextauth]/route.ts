@@ -36,6 +36,7 @@ export const authOptions: NextAuthOptions = {
         if (!isPasswordValid) {
           throw new Error("Invalid credentials");
         }
+
         return {
           id: user.id,
           email: user.email,
@@ -50,13 +51,23 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          access_type: "offline", // ensures refresh_token
+          prompt: "consent", // always ask so we get refresh_token
+        },
+      },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
+
+  session: { strategy: "jwt" },
+
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      if (account) {
+        token.accessToken = account.access_token ?? null;
+        token.refreshToken = account.refresh_token ?? null;
+      }
       if (user) {
         token.id = user.id ?? null;
         token.email = user.email ?? null;
@@ -69,11 +80,15 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id ?? null;
         session.user.email = token.email ?? null;
         session.user.role = token.role ?? null;
+        session.user.accessToken = token.accessToken ?? null;
+        session.user.refreshToken = token.refreshToken ?? null;
       }
       return session;
     },
   },
+
   secret: process.env.NEXTAUTH_SECRET,
+
   pages: {
     signIn: "/auth",
   },

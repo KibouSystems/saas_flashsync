@@ -8,6 +8,8 @@ declare module "next-auth" {
     firstname?: string | null;
     lastname?: string | null;
     role?: string | null;
+    accessToken? : string |null;
+    refreshToken?: string | null;
   }
 
   interface Session extends DefaultSession {
@@ -19,6 +21,8 @@ declare module "next-auth" {
       firstname?: string | null;
       lastname?: string | null;
       role?: string | null;
+      accessToken?: string | null;   // <-- pass Gmail token to session
+      refreshToken?: string | null;
     };
   }
 }
@@ -29,5 +33,7 @@ declare module "next-auth/jwt" {
     email: string | null;
     username?: string | null;
     role?: string | null;
+    accessToken?: string | null;   // <-- store Gmail token
+    refreshToken?: string | null;
   }
 }
