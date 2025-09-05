@@ -10,7 +10,6 @@ const Page = () => {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
 
-  console.log(session)
 
   const handleSubmit = async () => {
     if (!file) {
@@ -50,24 +49,27 @@ const Page = () => {
         className="border p-2 rounded bg-gray-100 cursor-not-allowed"
       />
 
-      <label>Enter Subject:</label>
+      <label htmlFor="subject">Enter Subject:</label>
       <input
+        id='subject'
         type="text"
         className="border p-2"
         value={subject}
         onChange={(e) => setSubject(e.target.value)}
       />
 
-      <label>Enter Body:</label>
+      <label htmlFor="body">Enter Body:</label>
       <textarea
+        id='body'
         className="border p-2"
         rows={10}
         value={body}
         onChange={(e) => setBody(e.target.value)}
       />
 
-      <label>Upload CSV (with Email column):</label>
+      <label htmlFor="file">Upload CSV (with Email column):</label>
       <input
+        id='file'
         type="file"
         accept=".csv"
         onChange={(e) => setFile(e.target.files?.[0] || null)}
