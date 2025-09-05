@@ -64,16 +64,22 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
 
   callbacks: {
-    async jwt({ token, account, user }) {
+    async jwt({ token, account, user, profile }) {
       if (account) {
         token.accessToken = account.access_token as string;
         token.refreshToken = account.refresh_token as string;
       }
-      if (user) {
+      if(profile?.email){
+        token.email = profile.email;
+      } else if(user?.email){
+        token.email = user.email;
+      }
+
+      if(user){
         token.id = user.id ?? null;
-        token.email = user.email ?? null;
         token.role = user.role ?? null;
       }
+
       return token;
     },
     async session({ session, token }) {

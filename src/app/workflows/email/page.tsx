@@ -1,11 +1,16 @@
 "use client";
 import React, { useState } from "react";
+import { useSession } from "next-auth/react";
 
 const Page = () => {
+
+    const {data: session} = useSession();
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
+
+  console.log(session)
 
   const handleSubmit = async () => {
     if (!file) {
@@ -36,6 +41,14 @@ const Page = () => {
   return (
     <div className="flex flex-col gap-4 p-4">
       <h1 className="text-xl font-bold">Email Workflow</h1>
+
+      <label className="font-medium">Logged in as:</label>
+      <input
+        type="email"
+        value={session?.user?.email || ""}
+        disabled
+        className="border p-2 rounded bg-gray-100 cursor-not-allowed"
+      />
 
       <label>Enter Subject:</label>
       <input

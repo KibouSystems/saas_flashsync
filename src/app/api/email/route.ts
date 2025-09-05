@@ -55,10 +55,16 @@ export async function POST(req: NextRequest) {
   for (const r of recipients) {
     if (!r.email) continue; // skip if no email
 
-    const personalizedBody = body.replace(
-      /{name}/g,
-      `${r.firstName} ${r.lastName}`
+    let personalizedBody = body;
+    personalizedBody = personalizedBody.replace(
+      /{{First Name}}/g,
+      r.firstName || ""
     );
+    personalizedBody = personalizedBody.replace(
+      /{{Last Name}}/g,
+      r.lastName || ""
+    );
+    personalizedBody = personalizedBody.replace(/{{Email}}/g, r.email || "");
 
     const message = `To: ${r.email}
 Subject: ${subject}
