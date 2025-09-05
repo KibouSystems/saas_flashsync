@@ -55,6 +55,7 @@ export const authOptions: NextAuthOptions = {
         params: {
           access_type: "offline", // ensures refresh_token
           prompt: "consent", // always ask so we get refresh_token
+          scope:"openid email profile https://www.googleapis.com/auth/gmail.send"
         },
       },
     }),
@@ -63,10 +64,10 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, account, user }) {
       if (account) {
-        token.accessToken = account.access_token ?? null;
-        token.refreshToken = account.refresh_token ?? null;
+        token.accessToken = account.access_token as string;
+        token.refreshToken = account.refresh_token as string;
       }
       if (user) {
         token.id = user.id ?? null;
@@ -76,13 +77,11 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id ?? null;
-        session.user.email = token.email ?? null;
-        session.user.role = token.role ?? null;
-        session.user.accessToken = token.accessToken ?? null;
-        session.user.refreshToken = token.refreshToken ?? null;
-      }
+      session.user.id = token.id ?? null;
+      session.user.email = token.email ?? null;
+      session.user.role = token.role ?? null;
+      session.accessToken = token.accessToken ?? null;
+      session.refreshToken = token.refreshToken ?? null;
       return session;
     },
   },
